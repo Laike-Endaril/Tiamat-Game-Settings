@@ -1,0 +1,5 @@
+options.txt is used as "defaults" and may or may not be getting overridden by modpack updates
+optionsDefault.txt is a temporary file; options.txt is copied into it at startup since options.txt can get overridden by new modpack defaults or by in-game changes to settings
+
+
+optionsAdventure.txt (and similar) are per-gametype overrides
