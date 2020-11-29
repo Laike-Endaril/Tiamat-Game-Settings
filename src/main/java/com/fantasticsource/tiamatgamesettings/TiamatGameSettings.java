@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = TiamatGameSettings.MODID, name = TiamatGameSettings.NAME, version = TiamatGameSettings.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.041e,)", acceptableRemoteVersions = "*")
+@Mod(modid = TiamatGameSettings.MODID, name = TiamatGameSettings.NAME, version = TiamatGameSettings.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.041f,)", acceptableRemoteVersions = "*")
 public class TiamatGameSettings
 {
     public static final String MODID = "tiamatgamesettings";
