@@ -4,11 +4,14 @@ import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.event.GametypeChangedEvent;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.fantasticsource.tiamatgamesettings.TiamatGameSettings.MODID;
 
@@ -20,6 +23,7 @@ public class OptionsHandler
     public static void gametypeChanged(GametypeChangedEvent event)
     {
         Minecraft mc = Minecraft.getMinecraft();
+        if (event.player != mc.player) return;
 
         GameType oldGameType = event.oldGameType;
         if (oldGameType != null)
@@ -52,6 +56,14 @@ public class OptionsHandler
             File file = new File(dir, "options.txt");
             if (file.exists())
             {
+                //GameSettings.loadOptions() does not apply resource packs; need to do it manually
+
+
+                //Copy current resource pack info
+                ArrayList<String> resourcePacks = new ArrayList<>(mc.gameSettings.resourcePacks);
+
+
+                //Replace options.txt
                 try
                 {
                     Tools.copyFile(file, DEFAULT_OPTIONS_FILE);
@@ -61,7 +73,43 @@ public class OptionsHandler
                     e.printStackTrace();
                 }
 
+
+                //Load options.txt
                 Minecraft.getMinecraft().gameSettings.loadOptions();
+
+
+                //Check resource packs, and reapply them if there is a mismatch
+                boolean match = mc.gameSettings.resourcePacks.size() == resourcePacks.size();
+                if (match)
+                {
+                    for (String s : resourcePacks)
+                    {
+                        if (!mc.gameSettings.resourcePacks.contains(s))
+                        {
+                            match = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (!match)
+                {
+                    mc.getResourcePackRepository().updateRepositoryEntriesAll();
+
+                    List<ResourcePackRepository.Entry> list = new ArrayList<>();
+                    for (ResourcePackRepository.Entry entry : mc.getResourcePackRepository().getRepositoryEntriesAll())
+                    {
+                        if (mc.gameSettings.resourcePacks.contains(entry.getResourcePackName()))
+                        {
+                            list.add(entry);
+                            break;
+                        }
+                    }
+                    mc.getResourcePackRepository().setRepositories(list);
+
+                    mc.gameSettings.saveOptions();
+                    mc.refreshResources();
+                }
             }
         }
     }
