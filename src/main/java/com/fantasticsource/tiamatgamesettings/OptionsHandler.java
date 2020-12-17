@@ -17,13 +17,26 @@ import static com.fantasticsource.tiamatgamesettings.TiamatGameSettings.MODID;
 
 public class OptionsHandler
 {
-    public static final File DEFAULT_OPTIONS_FILE = new File(MCTools.getConfigDir() + ".." + File.separator + "options.txt");
+    public static final File
+            DEFAULT_OPTIONS_FILE = new File(MCTools.getConfigDir() + ".." + File.separator + "options.txt"),
+            BACKUP_OPTIONS_FILE = new File(MCTools.getConfigDir() + ".." + File.separator + "optionsBackup.txt");
 
     @SubscribeEvent
     public static void gametypeChanged(GametypeChangedEvent event)
     {
         Minecraft mc = Minecraft.getMinecraft();
         if (event.player != mc.player) return;
+
+
+        try
+        {
+            if (!BACKUP_OPTIONS_FILE.exists()) Tools.copyFile(DEFAULT_OPTIONS_FILE, BACKUP_OPTIONS_FILE);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
 
         GameType oldGameType = event.oldGameType;
         if (oldGameType != null)
