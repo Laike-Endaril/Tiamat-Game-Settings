@@ -18,7 +18,7 @@ import static com.fantasticsource.tiamatgamesettings.TiamatGameSettings.MODID;
 public class OptionsHandler
 {
     public static final File
-            DEFAULT_OPTIONS_FILE = new File(MCTools.getConfigDir() + ".." + File.separator + "options.txt"),
+            VANILLA_OPTIONS_FILE = new File(MCTools.getConfigDir() + ".." + File.separator + "options.txt"),
             BACKUP_OPTIONS_FILE = new File(MCTools.getConfigDir() + ".." + File.separator + "optionsBackup.txt");
 
     @SubscribeEvent
@@ -30,7 +30,7 @@ public class OptionsHandler
 
         try
         {
-            if (!BACKUP_OPTIONS_FILE.exists()) Tools.copyFile(DEFAULT_OPTIONS_FILE, BACKUP_OPTIONS_FILE);
+            if (!BACKUP_OPTIONS_FILE.exists()) Tools.copyFile(VANILLA_OPTIONS_FILE, BACKUP_OPTIONS_FILE);
         }
         catch (IOException e)
         {
@@ -50,7 +50,7 @@ public class OptionsHandler
             File file = new File(dir, "options.txt");
             try
             {
-                Tools.copyFile(DEFAULT_OPTIONS_FILE, file);
+                Tools.copyFile(VANILLA_OPTIONS_FILE, file);
             }
             catch (IOException e)
             {
@@ -65,8 +65,35 @@ public class OptionsHandler
             //Load gametype-specific options
 
             File dir = new File(MCTools.getConfigDir() + MODID + File.separator + newGameType.getName());
+            File defaultsDir = new File(MCTools.getConfigDir() + MODID + File.separator + "defaults" + File.separator + newGameType.getName());
             dir.mkdirs();
-            File file = new File(dir, "options.txt");
+            File file = new File(dir, "options.txt"), defaults = new File(defaultsDir, "defaults.txt");
+
+            try
+            {
+                if (file.exists())
+                {
+                    if (!defaults.exists()) Tools.copyFile(file, defaults);
+                }
+                else
+                {
+                    if (defaults.exists())
+                    {
+                        Tools.copyFile(defaults, file);
+                        long ms = System.currentTimeMillis();
+                        while (!file.exists())
+                        {
+                            if (System.currentTimeMillis() - ms > 1000) throw new IllegalStateException("Was unable to create file: " + file);
+                        }
+                    }
+                    else Tools.copyFile(VANILLA_OPTIONS_FILE, defaults);
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
             if (file.exists())
             {
                 //GameSettings.loadOptions() does not apply resource packs; need to do it manually
@@ -79,7 +106,7 @@ public class OptionsHandler
                 //Replace options.txt
                 try
                 {
-                    Tools.copyFile(file, DEFAULT_OPTIONS_FILE);
+                    Tools.copyFile(file, VANILLA_OPTIONS_FILE);
                 }
                 catch (IOException e)
                 {
