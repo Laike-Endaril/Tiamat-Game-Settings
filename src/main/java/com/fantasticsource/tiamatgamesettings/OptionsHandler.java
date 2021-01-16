@@ -151,6 +151,10 @@ public class OptionsHandler
                     mc.gameSettings.saveOptions();
                     mc.refreshResources();
                 }
+
+
+                //Fix audio
+                mc.getSoundHandler().onResourceManagerReload(mc.getResourceManager());
             }
         }
     }
