@@ -65,9 +65,10 @@ public class OptionsHandler
             //Load gametype-specific options
 
             File dir = new File(MCTools.getConfigDir() + MODID + File.separator + newGameType.getName());
-            File defaultsDir = new File(MCTools.getConfigDir() + MODID + File.separator + "defaults" + File.separator + newGameType.getName());
+            File defaultsDir = new File(MCTools.getConfigDir() + MODID + File.separator + "defaults");
             dir.mkdirs();
-            File file = new File(dir, "options.txt"), defaults = new File(defaultsDir, "defaults.txt");
+            defaultsDir.mkdirs();
+            File file = new File(dir, "options.txt"), defaults = new File(defaultsDir, newGameType.getName() + ".txt");
 
             try
             {
